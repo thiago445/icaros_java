@@ -1,42 +1,50 @@
-# Nome do workflow que aparecerá na aba "Actions" do GitHub
-name: Build and Push Java App to ACR
+# Nome do workflow
+name: Build and Deploy Java App to Azure App Service
 
 # Gatilho: Roda a cada 'push' na branch 'main' e permite execução manual
 on:
   push:
-    branches: ["main"]
+    branches:
+      - main
   workflow_dispatch:
 
-# Variáveis de ambiente para facilitar a configuração
+# Variáveis de ambiente
 env:
-  # 1. SUBSTITUA PELO NOME DO SEU REGISTRY CRIADO NO AZURE
-  ACR_REGISTRY_NAME: icaros-app-java
+  # 1. SUBSTITUA PELO NOME DO SEU APP SERVICE
+  AZURE_WEBAPP_NAME: icaros-api-2025
 
-  # 2. ESCOLHA UM NOME PARA A IMAGEM DA SUA API
-  APP_IMAGE_NAME: icaros-api
+  # 2. VERIFIQUE SE ESTA É A SUA VERSÃO DO JAVA
+  JAVA_VERSION: '21'
 
 jobs:
-  build-and-push-to-acr:
+  build-and-deploy:
+    # A máquina virtual que o GitHub usará
     runs-on: ubuntu-latest
 
     steps:
-      # Baixa o código do seu repositório para a máquina virtual
+      # Passo 1: Baixa o seu código do repositório
       - name: 'Check out repository code'
         uses: actions/checkout@v4
 
-      # Faz o login no seu Azure Container Registry (ACR)
-      - name: 'Log in to Azure Container Registry'
-        uses: azure/docker-login@v1
+      # Passo 2: Configura o Java (JDK) na máquina virtual
+      - name: 'Set up JDK ${{ env.JAVA_VERSION }}'
+        uses: actions/setup-java@v4
         with:
-          login-server: ${{ env.ACR_REGISTRY_NAME }}.azurecr.io
-          username: ${{ secrets.ACR_USERNAME }}
-          password: ${{ secrets.ACR_PASSWORD }}
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'microsoft'
 
-      # Constrói a imagem Docker e a envia para o seu ACR
-      - name: 'Build and push Docker image to ACR'
-        uses: docker/build-push-action@v5
+      # Passo 3: Constrói o projeto com Maven
+      # Isso vai compilar e gerar o arquivo .jar na pasta 'target/'
+      - name: 'Build with Maven'
+        run: mvn clean install -DskipTests
+
+      # Passo 4: Faz o deploy do arquivo .jar para o Azure App Service
+      # Ele usa o Publish Profile que você salvou como segredo
+      - name: 'Deploy to Azure Web App'
+        uses: azure/webapps-deploy@v2
         with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ env.ACR_NAME }}.azurecr.io/${{ env.APP_IMAGE_NAME }}:latest
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          # O segredo que você criou no GitHub
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          # O caminho para o artefato que o Maven gerou
+          package: '${{ github.workspace }}/target/*.jar'
