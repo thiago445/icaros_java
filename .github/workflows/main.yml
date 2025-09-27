@@ -11,7 +11,7 @@ on:
 # Variáveis de ambiente
 env:
   # 1. SUBSTITUA PELO NOME DO SEU APP SERVICE
-  AZURE_WEBAPP_NAME: icaros-api-2025
+  AZURE_WEBAPP_NAME: icaros-app-java
 
   # 2. VERIFIQUE SE ESTA É A SUA VERSÃO DO JAVA
   JAVA_VERSION: '21'
