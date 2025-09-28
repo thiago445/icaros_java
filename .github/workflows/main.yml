@@ -10,8 +10,8 @@ on:
 
 # Variáveis de ambiente para configurar facilmente
 env:
-  ACR_REGISTRY_NAME: icarosregisry
-  APP_IMAGE_NAME: icaros-api
+  ACR_REGISTRY_NAME: icarosregisry # <--- Nome do seu registro (sem o 't')
+  APP_IMAGE_NAME: minha-app      # <--- Nome que você quer dar para a imagem
 
 jobs:
   # Nome do nosso único "job" (trabalho)
