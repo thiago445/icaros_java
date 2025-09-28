@@ -1,6 +1,8 @@
 name: Build and Deploy Java App to Azure App application
 
 on:
+  push:
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
