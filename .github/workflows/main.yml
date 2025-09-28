@@ -1,50 +1,31 @@
-# Nome do workflow
 name: Build and Deploy Java App to Azure App Service
 
-# Gatilho: Roda a cada 'push' na branch 'main' e permite execução manual
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
-
-# Variáveis de ambiente
-env:
-  # 1. SUBSTITUA PELO NOME DO SEU APP SERVICE
-  AZURE_WEBAPP_NAME: icaros-app-java
-
-  # 2. VERIFIQUE SE ESTA É A SUA VERSÃO DO JAVA
-  JAVA_VERSION: '21'
 
 jobs:
   build-and-deploy:
-    # A máquina virtual que o GitHub usará
     runs-on: ubuntu-latest
 
     steps:
-      # Passo 1: Baixa o seu código do repositório
-      - name: 'Check out repository code'
-        uses: actions/checkout@v4
+      - name: Checkout source
+        uses: actions/checkout@v2
 
-      # Passo 2: Configura o Java (JDK) na máquina virtual
-      - name: 'Set up JDK ${{ env.JAVA_VERSION }}'
-        uses: actions/setup-java@v4
+      - name: Docker Login to ACR
+        uses: azure/docker-login@v1
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'microsoft'
+          login-server: icarosregisry.azurecr.io
+          username: ${{ secrets.REGISTRY_NAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      # Passo 3: Constrói o projeto com Maven
-      # Isso vai compilar e gerar o arquivo .jar na pasta 'target/'
-      - name: 'Build with Maven'
-        run: mvn clean install -DskipTests
+      - name: Build Docker Image
+        run: docker build . -t icarosregisry.azurecr.io/minha-app:${{ github.sha }}
 
-      # Passo 4: Faz o deploy do arquivo .jar para o Azure App Service
-      # Ele usa o Publish Profile que você salvou como segredo
-      - name: 'Deploy to Azure Web App'
+      - name: Push Docker Image
+        run: docker push icarosregisry.azurecr.io/minha-app:${{ github.sha }}
+
+      - name: Deploy to Azure Web App using Publish Profile
         uses: azure/webapps-deploy@v2
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          # O segredo que você criou no GitHub
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          # O caminho para o artefato que o Maven gerou
-          package: '${{ github.workspace }}/target/*.jar'
+          images: icarosregisry.azurecr.io/minha-app:${{ github.sha }}
