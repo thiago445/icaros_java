@@ -1,4 +1,4 @@
-name: Build and Deploy Java App to Azure App Service
+name: Build and Deploy Java App to Azure App application
 
 on:
   workflow_dispatch:
