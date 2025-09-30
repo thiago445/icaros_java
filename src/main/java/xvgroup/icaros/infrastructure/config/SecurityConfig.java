@@ -96,8 +96,8 @@ public class SecurityConfig {
 
     private RSAPrivateKey parsePrivateKey(String key) throws Exception {
         String privateKeyContent = key
-                .replace("-----BEGIN RSA PRIVATE KEY-----", "")
-                .replace("-----END RSA PRIVATE KEY-----", "")
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
         byte[] encoded = Base64.getDecoder().decode(privateKeyContent);
         KeyFactory keyFactory = KeyFactory.getInstance("RSA");
