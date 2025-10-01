@@ -20,7 +20,7 @@ public record ResponseAllTweets (String title,
                                  String messageContent,
                                  String mediaUrl,
                                  Instant creationTimesTamp,
-                                 String Creator){
+                                 UserResponse Creator){
 
 
     public static ResponseAllTweets toResponseAllTweets(Tweet value) {
@@ -28,6 +28,7 @@ public record ResponseAllTweets (String title,
                 value.getMessageContent(),
                 value.getMediaUrl(),
                 value.getCreationTimestamp(),
-                value.getUser().getName());
+                UserResponse.fromEntity(value.getUser())
+        );
     }
 }
