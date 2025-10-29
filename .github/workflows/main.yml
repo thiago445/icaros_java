@@ -6,11 +6,11 @@ on:
   workflow_dispatch:
 
 env:
-  ACR_NAME: icarosRegisry       # nome do Container Registry (lowercase)
+  ACR_NAME: icaros       # nome do Container Registry (lowercase)
   IMAGE_NAME: minha-app          # nome da imagem (sem espaços)
-  WEBAPP_NAME: icaros-app     # nome do seu App Service
+  WEBAPP_NAME: icaros     # nome do seu App Service
 
-jobs:
+jobs:  
   build-push-deploy:
     runs-on: ubuntu-latest
 
