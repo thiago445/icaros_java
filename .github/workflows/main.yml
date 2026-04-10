@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  ACR_NAME: icarosregistry
+  ACR_NAME: icarosregistrythiago
   IMAGE_NAME: icaros-api
-  WEBAPP_NAME: icaros-app-java
+  WEBAPP_NAME: icaros-app-java-thiago
 
 jobs:  
   build-push-deploy:
@@ -22,15 +22,15 @@ jobs:
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
-          login-server: icarosregistry.azurecr.io
+          login-server: icarosregistrythiago.azurecr.io
           username: ${{ secrets.REGISTRY_NAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       # 2. Build e push da imagem
       - name: Build and Push Docker image
         run: |
-          docker build -t icarosregistry.azurecr.io/icaros-api:latest .
-          docker push icarosregistry.azurecr.io/icaros-api:latest
+          docker build -t icarosregistrythiago.azurecr.io/icaros-api:latest .
+          docker push icarosregistrythiago.azurecr.io/icaros-api:latest
 
       # 3. Deploy no Azure App Service (Publish Profile)
       - name: Deploy to Azure WebApp
