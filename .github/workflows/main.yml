@@ -1,0 +1,41 @@
+name: Build, Push and Deploy to Azure Web App (Publish Profile)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  ACR_NAME: icarosregistry
+  IMAGE_NAME: icaros-api
+  WEBAPP_NAME: icaros-app-java
+
+jobs:  
+  build-push-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      # 1. Login no ACR
+      - name: Login to ACR
+        uses: azure/docker-login@v1
+        with:
+          login-server: icarosregistry.azurecr.io
+          username: ${{ secrets.REGISTRY_NAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # 2. Build e push da imagem
+      - name: Build and Push Docker image
+        run: |
+          docker build -t icarosregistry.azurecr.io/icaros-api:latest .
+          docker push icarosregistry.azurecr.io/icaros-api:latest
+
+      # 3. Deploy no Azure App Service (Publish Profile)
+      - name: Deploy to Azure WebApp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: icaros-app-java
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: icarosregistry.azurecr.io/icaros-api:latest
