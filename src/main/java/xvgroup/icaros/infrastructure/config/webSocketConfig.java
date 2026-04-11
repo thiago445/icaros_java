@@ -19,8 +19,8 @@ public class webSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-chat")
-                // 👇 MUDE AQUI: Retire o asterisco e coloque a URL exata do Front 👇
-                .setAllowedOrigins("http://localhost:3000")
+                // 👇 ADICIONE A VERCEL AQUI TAMBÉM 👇
+                .setAllowedOrigins("http://localhost:3000", "https://iicaross.vercel.app") 
                 .withSockJS();
     }
 }
