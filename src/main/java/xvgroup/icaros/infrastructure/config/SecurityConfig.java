@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/user").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
-                        .requestMatchers("/ws-chat/**").permitAll()
+                        .requestMatchers("/ws-chat/**", "/ws-chat/info/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register/producer").permitAll()
                         .requestMatchers(HttpMethod.POST, "/register/listener").permitAll()
                         .requestMatchers(HttpMethod.GET, "/tweet/alltweets").permitAll()
