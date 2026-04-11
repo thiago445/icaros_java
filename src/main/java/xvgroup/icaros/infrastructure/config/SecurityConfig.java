@@ -73,23 +73,31 @@ public class SecurityConfig {
     }
 
   @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        
-        configuration.setAllowedOrigins(List.of(
-            "http://localhost:3000", 
-            "https://iicaross.vercel.app"
-        ));
-        
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-        
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+  public CorsConfigurationSource corsConfigurationSource() {
+      CorsConfiguration configuration = new CorsConfiguration();
+      
+      // 1. Verifique se as URLs estão EXATAMENTE assim (sem barra no final)
+      configuration.setAllowedOrigins(List.of(
+          "http://localhost:3000", 
+          "https://iicaross.vercel.app"
+      ));
+      
+      // 2. Garanta que esses métodos estão liberados
+      configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+      
+      // 3. Importante: Adicione esses Headers explicitamente
+      configuration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
+      
+      // 4. A linha que o erro está pedindo
+      configuration.setAllowCredentials(true);
+      
+      // 5. Exponha os headers (ajuda o navegador a ler a resposta)
+      configuration.setExposedHeaders(List.of("Authorization"));
+  
+      UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+      source.registerCorsConfiguration("/**", configuration);
+      return source;
     }
-
     @Bean
     public JwtDecoder jwtDecoder() throws Exception {
         return NimbusJwtDecoder.withPublicKey(parsePublicKey(publicKeyPEM)).build();
