@@ -43,6 +43,38 @@ public class ProfileService {
         profileUserRepository.save(profile);
 
     }
+    public void updateProfile(RequestProfile dto, String profilePictureUrl, String coverPhotoUrl, JwtAuthenticationToken token) {
+
+        User user = userRepository.findById(UUID.fromString(token.getToken().getSubject()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // Se for update, o perfil OBRIGATORIAMENTE tem que existir
+        ProfileUser profile = profileUserRepository.findByUser(user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Profile not found"));
+
+        // Atualização Parcial: Só substitui se o valor não for nulo nem vazio
+        if (dto != null) {
+            if (dto.nickName() != null && !dto.nickName().isBlank()) {
+                profile.setNickName(dto.nickName());
+            }
+            if (dto.city() != null && !dto.city().isBlank()) {
+                profile.setCity(dto.city());
+            }
+            if (dto.bio() != null && !dto.bio().isBlank()) {
+                profile.setBio(dto.bio());
+            }
+        }
+
+        // Só atualiza as fotos se novos arquivos foram enviados
+        if (profilePictureUrl != null && !profilePictureUrl.isEmpty()) {
+            profile.setUrlProfile(profilePictureUrl);
+        }
+        if (coverPhotoUrl != null && !coverPhotoUrl.isEmpty()) {
+            profile.setCoverPhotoUrl(coverPhotoUrl);
+        }
+
+        profileUserRepository.save(profile);
+    }
 
     public ResponseProfile getProfile(UUID userId) {
 

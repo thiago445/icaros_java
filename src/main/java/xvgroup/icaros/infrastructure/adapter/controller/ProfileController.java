@@ -54,6 +54,7 @@ public class ProfileController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error to create .");
         }
     }
+    
 
     @GetMapping("/profile")
     ResponseEntity<ResponseProfile> getProfileUser( JwtAuthenticationToken token){
@@ -68,6 +69,38 @@ public class ProfileController {
        return ResponseEntity.ok(profile);
         
 
+    }
+    @PutMapping("/update")
+    public ResponseEntity<String> updateProfile(
+            @RequestPart(value = "profileData", required = false) RequestProfile dto,
+            @RequestPart(value = "profilePicture", required = false) MultipartFile profilePictureFile,
+            @RequestPart(value = "coverPhoto", required = false) MultipartFile coverPhotoFile,
+            JwtAuthenticationToken token) 
+    {
+        try {
+            String profilePictureUrl = null;
+            String coverPhotoUrl = null;
+
+            // Só faz upload pro Azure se o arquivo realmente veio na requisição
+            if (profilePictureFile != null && !profilePictureFile.isEmpty()) {
+                profilePictureUrl = azureStorageService.uploadFile(profilePictureFile, "profile-pictures");
+            }
+
+            if (coverPhotoFile != null && !coverPhotoFile.isEmpty()) {
+                coverPhotoUrl = azureStorageService.uploadFile(coverPhotoFile, "cover-photos");
+            }
+
+            profileService.updateProfile(dto, profilePictureUrl, coverPhotoUrl, token);
+
+            return ResponseEntity.ok("Profile updated successfully!");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error uploading files to Azure.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating profile.");
+        }
     }
 
 }
