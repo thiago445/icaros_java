@@ -12,21 +12,17 @@ public record ChatMessageResponse(
         UserResponse receiver,
         boolean read,
         Instant sentAt,
-        ReplyPreview replyTo // NOVO: Campo opcional para a citação
+        ReplyPreview replyTo
 ) {
     public static ChatMessageResponse fromEntity(ChatMessage message) {
         
-        // NOVO: Verifica se existe uma mensagem sendo respondida
         ReplyPreview replyPreview = null;
         if (message.getReplyTo() != null) {
-            String nicknameOrName = message.getReplyTo().getSender().getNickName() != null 
-                    ? message.getReplyTo().getSender().getNickName() 
-                    : message.getReplyTo().getSender().getName();
-
+            // CORREÇÃO: Usando apenas getName() porque a entidade User não tem nickName
             replyPreview = new ReplyPreview(
                     message.getReplyTo().getId(),
                     message.getReplyTo().getContent(),
-                    nicknameOrName
+                    message.getReplyTo().getSender().getName() 
             );
         }
 
@@ -37,12 +33,12 @@ public record ChatMessageResponse(
                 UserResponse.fromEntity(message.getReceiver()),
                 message.isRead(),
                 message.getSentAt(),
-                replyPreview // Adiciona o preview aqui
+                replyPreview
         );
     }
 }
 
-// NOVO: Sub-record que envia apenas o essencial da mensagem citada pro frontend
+// Sub-record para enviar apenas o essencial da mensagem citada pro frontend
 record ReplyPreview(
         UUID id, 
         String content, 
