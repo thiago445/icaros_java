@@ -22,6 +22,7 @@ public class ChatMessage {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    // Garante que o texto seja mapeado como LONGTEXT/TEXT no banco para suportar mensagens grandes
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
@@ -32,9 +33,15 @@ public class ChatMessage {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id", nullable = false)
     private User receiver;
+
     @Column(name = "is_read", nullable = false)
     private boolean read = false;
 
     @CreationTimestamp
     private Instant sentAt;
+
+    // NOVO: Relacionamento para a mensagem que está sendo respondida (opcional)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reply_to_id")
+    private ChatMessage replyTo;
 }

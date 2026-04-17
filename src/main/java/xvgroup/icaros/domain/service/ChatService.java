@@ -53,11 +53,17 @@ public class ChatService {
         message.setReceiver(receiver);
         message.setContent(request.content());
 
+        // NOVO: Processa a citação se o replyToId for enviado
+        if (request.replyToId() != null) {
+            ChatMessage repliedMessage = chatMessageRepository.findById(request.replyToId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Replied message not found"));
+            message.setReplyTo(repliedMessage);
+        }
+
         chatMessageRepository.save(message);
 
         ChatMessageResponse response = ChatMessageResponse.fromEntity(message);
 
-        // A MÁGICA ACONTECE AQUI:
         // Notifica o destinatário no canal exclusivo dele
         messagingTemplate.convertAndSend("/topic/messages/" + receiver.getUserId(), response);
 
