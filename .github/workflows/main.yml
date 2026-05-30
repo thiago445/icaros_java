@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
 
 env:
-  ACR_NAME: icarosregistrythiago
+  ACR_NAME: icarosregistrythiago2
   IMAGE_NAME: icaros-api
-  WEBAPP_NAME: icaros-app-java-thiago
+  WEBAPP_NAME: icaros-app-java-thiago2
 
 jobs:  
   build-push-deploy:
