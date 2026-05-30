@@ -22,20 +22,20 @@ jobs:
       - name: Login to ACR
         uses: azure/docker-login@v1
         with:
-          login-server: icarosregistrythiago.azurecr.io
+          login-server: icarosregistrythiago2.azurecr.io
           username: ${{ secrets.REGISTRY_NAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
       # 2. Build e push da imagem
       - name: Build and Push Docker image
         run: |
-          docker build -t icarosregistrythiago.azurecr.io/icaros-api:latest .
-          docker push icarosregistrythiago.azurecr.io/icaros-api:latest
+          docker build -t icarosregistrythiago2.azurecr.io/icaros-api:latest .
+          docker push icarosregistrythiago2.azurecr.io/icaros-api:latest
 
       # 3. Deploy no Azure App Service (Publish Profile)
       - name: Deploy to Azure WebApp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: icaros-app-java-thiago
+          app-name: icaros-app-java-thiago2
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          images: icarosregistrythiago.azurecr.io/icaros-api:latest
+          images: icarosregistrythiago2.azurecr.io/icaros-api:latest
